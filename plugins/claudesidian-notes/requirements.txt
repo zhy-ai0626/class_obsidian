@@ -1,0 +1,11 @@
+# Shared script dependencies; install into a virtual environment.
+requests
+python-dotenv
+rich
+PyYAML
+PyMuPDF
+Pillow
+python-pptx
+python-docx
+pandas
+openpyxl

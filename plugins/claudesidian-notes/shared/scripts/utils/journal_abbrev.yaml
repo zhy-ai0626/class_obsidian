@@ -1,0 +1,109 @@
+# 期刊全名 → CAS 标准缩写映射
+# 用于 generate_paper_id() 生成 paper_id 的期刊部分
+# 大小写不敏感匹配
+# 来源：CAS Source Index (CASSI) + 文献界惯例
+# 覆盖范围：化学、材料、聚合物、传感器、电化学领域常见期刊（约 60 个）
+
+# === ACS 期刊 ===
+"Journal of the American Chemical Society": jacs
+"Chemical Reviews": chemrev
+"Chemistry of Materials": chemmat
+"ACS Nano": acsnano
+"ACS Applied Materials & Interfaces": acsami
+"ACS Applied Polymer Materials": acsapm
+"ACS Applied Nano Materials": acsanm
+"ACS Applied Energy Materials": acsaem
+"ACS Applied Bio Materials": acsabm
+"ACS Macro Letters": acsml
+"ACS Materials Letters": acsmat
+"ACS Energy Letters": acseng
+"ACS Sensors": acssen
+"ACS Sustainable Chemistry & Engineering": acssus
+"ACS Central Science": acscs
+"Macromolecules": macrom
+"Analytical Chemistry": analch
+"Langmuir": langmu
+
+# === Wiley 期刊 ===
+"Advanced Materials": advmat
+"Advanced Functional Materials": adfm
+"Advanced Energy Materials": aenm
+"Advanced Science": advsci
+"Advanced Healthcare Materials": adhm
+"Advanced Electronic Materials": aelm
+"Advanced Optical Materials": adom
+"Small": small
+"Small Methods": smtd
+"Small Structures": smstr
+"Macromolecular Rapid Communications": marc
+"Macromolecular Chemistry and Physics": macp
+"Angewandte Chemie International Edition": angew
+"Angewandte Chemie": angew
+"InfoMat": infomat
+"Aggregate": aggreg
+"SmartMat": smartm
+"EcoMat": ecomat
+"Battery Energy": batten
+
+# === Nature 系列 ===
+"Nature": nature
+"Nature Materials": natmat
+"Nature Communications": natcom
+"Nature Chemistry": natchem
+"Nature Nanotechnology": natnano
+"Nature Electronics": natele
+"Nature Energy": natene
+
+# === Science 系列 ===
+"Science": science
+"Science Advances": sciadv
+"Science Robotics": scirob
+
+# === Elsevier 期刊 ===
+"Chemical Engineering Journal": cej
+"Composites Science and Technology": cst
+"Composites Part A": compa
+"Composites Part B": compb
+"Polymer": polymer
+"European Polymer Journal": epj
+"Carbon": carbon
+"Nano Energy": nanoen
+"Energy Storage Materials": ensm
+"Carbohydrate Polymers": carbpo
+"Journal of Power Sources": jps
+"Electrochimica Acta": eleca
+"Journal of Molecular Liquids": jml
+"Materials Today": mattod
+"Materials Today Energy": mte
+"Sensors and Actuators B": sab
+
+# === RSC 期刊 ===
+"Chemical Society Reviews": csr
+"Chemical Science": chemsc
+"Journal of Materials Chemistry A": jmca
+"Journal of Materials Chemistry B": jmcb
+"Journal of Materials Chemistry C": jmcc
+"Materials Horizons": mathor
+"Soft Matter": softm
+"Polymer Chemistry": polych
+"Energy & Environmental Science": ees
+
+# === Cell Press / 跨出版社 ===
+"Joule": joule
+"Matter": matter
+"Cell Reports Physical Science": crps
+"Device": device
+
+# === 国家科学院系列 ===
+"Proceedings of the National Academy of Sciences": pnas
+"PNAS": pnas
+
+# === npj 系列 ===
+"npj Flexible Electronics": npjfe
+"npj Computational Materials": npjcm
+
+# === 其他重要期刊 ===
+"Research": research
+"National Science Review": nsr
+"Nano Letters": nanole
+"Giant": giant
