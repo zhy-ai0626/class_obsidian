@@ -8,7 +8,7 @@
       "name": "claudesidian-notes",
       "source": "./plugins/claudesidian-notes",
       "description": "Obsidian 课程与论文笔记流水线：讲义整理、习题解答、原理蒸馏、论文处理；包含 4 个技能、2 个命令及共享脚本。",
-      "version": "0.1.1"
+      "version": "0.1.2"
     }
   ],
   "metadata": {
