@@ -24,7 +24,7 @@ claude plugin install claudesidian-notes@class-obsidian --scope user
 
 ## 使用方式
 
-在 Obsidian 笔记库根目录启动 Claude Code，说明课程代号、源材料和目标目录。默认课程目录约定为 `01_Projects/<CODE>_课名/`。
+在 Obsidian 笔记库根目录启动 Claude Code，说明课程代号、源材料和目标目录。默认课程目录约定为 `01_Projects/<CODE>_课名/`；`ingest-lecture` 也可指定任意课程文件夹（COURSE_ROOT）。
 
 | 技能 | 可以直接这样说 |
 |---|---|
@@ -41,6 +41,10 @@ claude plugin install claudesidian-notes@class-obsidian --scope user
 ```
 
 其中 `distill-all` 原有默认扫描范围为 `01_Projects/CME*`；其他课程前缀请明确要求 Claude 调整扫描范围。
+
+### 在 Codex 中使用
+
+Codex 不会像 Claude Code 那样自动带上插件说明，建议使用 [`docs/course-ingest-prompt.md`](docs/course-ingest-prompt.md) 里的提示词模板：复制 `---` 之后的全文，填好参数区再发送。
 
 ## Python 脚本依赖
 
@@ -78,9 +82,14 @@ plugins/claudesidian-notes/
   shared/                       共享资源与 Python 脚本
   requirements.txt              脚本依赖
   README.md                     原插件详细说明
+docs/
+  course-ingest-prompt.md        Codex 等环境用的课程整理提示词模板
 ```
 
 本仓库基于本机已安装的 `claudesidian-notes` v0.1.0，保留原插件作者署名 `iZHENGjy`。v0.1.1 增加 Claude Code 市场入口、安装说明和依赖清单，并修正插件元数据格式；技能正文与共享脚本保持原样。
+
+- v0.1.2：`ingest-lecture` 改为"讲透优先"——新增讲透标准（直觉、动机、公式代入、过程演示、常见坑等），准确性红线收窄为"不歪曲课件事实"，正文禁用免责语，增加讲透自检。
+- v0.1.3：`ingest-lecture` 新增讲解核查（分段对照课件原图核对事实与讲解）、课件有误时的纠正规则、页码核实；命令改为 macOS/Linux 可用（`python3`、Python 替代 PowerShell），课程路径支持任意文件夹；新增 `docs/` 提示词模板。
 
 结构验证命令：
 
