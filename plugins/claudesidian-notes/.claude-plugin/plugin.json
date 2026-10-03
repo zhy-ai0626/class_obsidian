@@ -1,6 +1,6 @@
 {
   "name": "claudesidian-notes",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Obsidian 课程与论文笔记流水线：讲义整理、习题解答、原理蒸馏、论文处理；包含 4 个技能、2 个命令及共享脚本。",
   "author": {
     "name": "iZHENGjy"

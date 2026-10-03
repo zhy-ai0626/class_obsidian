@@ -1,6 +1,6 @@
 ---
 name: ingest-lecture
-description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知识块组织的课程笔记,写入 01_Projects/<CODE>_课名/L##.md,并更新 index.md 和 manifest.md。只要用户提到"整理这节课 / 处理这份 PPT / 把 slides 变成笔记 / ingest lecture / process slides",或附上课程 PPT/PDF 要做笔记,就用本 skill,即使没说"ingest"。用户说"生成完整 index / 结课整理 index / 升级 MOC"也用本 skill（走 §结课 MOC 升级独立入口,不跑常规步骤）。不要用于:tutorial/习题（→ ingest-tutorial）、科研论文（→ ingest-paper）、要交的作业报告（→ chemeng-coursework plugin）。
+description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知识块组织的课程笔记,写入课程文件夹 <COURSE_ROOT>/L##.md,并更新 index.md 和 manifest.md。只要用户提到"整理这节课 / 处理这份 PPT / 把 slides 变成笔记 / ingest lecture / process slides",或附上课程 PPT/PDF 要做笔记,就用本 skill,即使没说"ingest"。用户说"生成完整 index / 结课整理 index / 升级 MOC"也用本 skill（走 §结课 MOC 升级独立入口,不跑常规步骤）。不要用于:tutorial/习题（→ ingest-tutorial）、科研论文（→ ingest-paper）、要交的作业报告（→ chemeng-coursework plugin）。
 ---
 
 # Skill: ingest-lecture
@@ -25,30 +25,33 @@ description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知�
 
 - Lecture 材料(PPT / PDF / 文本 / 图片)
 - **课程代码** + **周次** + **lecture 编号**(缺则问一次,不猜)
+- **COURSE_ROOT**:课程文件夹。用户给了路径就用它(可以在桌面等任意位置);没给时默认 vault 下 `01_Projects/<CODE>_课名/`
 - 可选:日期 / 标题
 
 ## Outputs
 
-1. `01_Projects/<CODE>_课名/L##_topic_snake.md`(1 个文件)
-2. 更新 `01_Projects/<CODE>_课名/index.md`(MOC,增量追加 Week 段落)
+1. `<COURSE_ROOT>/L##_topic_snake.md`(1 个文件)
+2. 更新 `<COURSE_ROOT>/index.md`(MOC,增量追加 Week 段落)
 
 ## Dependencies
 
 启动时读:
 - `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/lecture-topic.md`(笔记模板)
 - `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/index-moc.md`(index.md 三阶段模板:桩 / Week 追加 / 结课完整 MOC)
-- `01_Projects/<CODE>_课名/index.md`(MOC,若存在)
+- `<COURSE_ROOT>/index.md`(MOC,若存在)
 
 工具:
 - `${CLAUDE_PLUGIN_ROOT}/shared/scripts/mineru_extract.py`(PDF → markdown + images,用 MinerU API)
 - `${CLAUDE_PLUGIN_ROOT}/shared/scripts/extract_images.py`(逐页 PNG 渲染,供 vision 核对;PPT 也用)
+- **平台与路径**:命令按 macOS / Linux 写(`python3`、POSIX shell);Windows 把 `python3` 换成 `py`。
+  `${CLAUDE_PLUGIN_ROOT}` 只在 Claude Code 里有值;Codex 等其他环境 = 本 SKILL.md 所在目录往上两级(插件根,含 `shared/`)
 - `.env` 含 `MINERU_API_TOKEN`(.gitignored,从 https://mineru.net/apiManage/token 申请)
 
 ## Workflow
 
 ### Step 1: 加载上下文
 
-1. 检查 `01_Projects/<CODE>_课名/` 是否存在;若不存在,**问用户**
+1. 检查 `<COURSE_ROOT>/` 是否存在;若不存在,**问用户**
    课程名 + 学期,创建文件夹 + 桩 `index.md`(按 `assets/index-moc.md` **阶段①**格式)。
 2. 读 MOC 看历史(domain_tags / 之前的 Week)。
 3. 加载 `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/lecture-topic.md`。
@@ -59,8 +62,8 @@ description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知�
 把原始 PDF/PPT 集中复制到 `_attachments/source/` 一份,以后回溯方便:
 
 ```bash
-mkdir -p "01_Projects/<CODE>_课名/_attachments/source/"
-cp "<source_path>" "01_Projects/<CODE>_课名/_attachments/source/"
+mkdir -p "<COURSE_ROOT>/_attachments/source/"
+cp "<source_path>" "<COURSE_ROOT>/_attachments/source/"
 ```
 
 - **保留原文件名**(不要改成 source.pdf)
@@ -73,7 +76,7 @@ cp "<source_path>" "01_Projects/<CODE>_课名/_attachments/source/"
 #### 2a: PDF — 用 MinerU API 抽 markdown(基础底稿)
 
 ```bash
-py ${CLAUDE_PLUGIN_ROOT}/shared/scripts/mineru_extract.py "<pdf_path>" "01_Projects/<CODE>_课名/_attachments/" --model vlm
+python3 ${CLAUDE_PLUGIN_ROOT}/shared/scripts/mineru_extract.py "<pdf_path>" "<COURSE_ROOT>/_attachments/" --model vlm
 ```
 
 输出:
@@ -85,7 +88,7 @@ py ${CLAUDE_PLUGIN_ROOT}/shared/scripts/mineru_extract.py "<pdf_path>" "01_Proje
 #### 2b: 逐页渲染 PNG(供 vision 核对;PPT 唯一处理方式)
 
 ```bash
-py ${CLAUDE_PLUGIN_ROOT}/shared/scripts/extract_images.py "<source>" "01_Projects/<CODE>_课名/_attachments/_pages/" --prefix <CODE>_L## --pages --dpi 150
+python3 ${CLAUDE_PLUGIN_ROOT}/shared/scripts/extract_images.py "<source>" "<COURSE_ROOT>/_attachments/_pages/" --prefix <CODE>_L## --pages --dpi 150
 ```
 
 **PDF 也跑 2b**(供 vision 对照 MinerU 结果,补 MinerU 漏抽的内容)。
@@ -112,7 +115,7 @@ Read `_attachments/<pdf_stem>/full.md`,作为内容基础底稿。
 
 #### 3c: 主线程聚合(批量 mv + 同步 full.md + verify Read)
 
-收齐所有 sub-agent 报告后,主线程做三件事:**1) 批量 mv 图片**（mv 必须主线程做——sub-agent 的 Bash 写操作会被沙箱拒）、**2) 同步 full.md 图引用**（❗易漏）、**3) verify Read 推荐度 ≥ 4 的图**。详细 PowerShell 步骤 + verdict 分类 → 见 `references/workflow-detail.md` §3c。
+收齐所有 sub-agent 报告后,主线程做三件事:**1) 批量 mv 图片**（mv 必须主线程做——sub-agent 的 Bash 写操作会被沙箱拒）、**2) 同步 full.md 图引用**（❗易漏）、**3) verify Read 推荐度 ≥ 4 的图**。详细步骤(Python 脚本,跨平台) + verdict 分类 → 见 `references/workflow-detail.md` §3c。
 
 #### 3d: 覆盖率确认
 
@@ -142,8 +145,15 @@ Read `_attachments/<pdf_stem>/full.md`,作为内容基础底稿。
   - 新手最容易错的点有 `[!warning] 常见坑` 吗?
   - grep 正文免责语(`未展开|未说明|不能读成|不能当作|不补|没有给出`)——应为 0,命中就改成讲解或移到疑问
   - 报告 `讲透自检: N/N 知识块达标`,不达标的列出来补写后再报告
+- **讲解核查**(讲透自检只查"有没有",这一步查"对不对"):
+  按页码把笔记分 2-4 段(和 Step 3b 同样的分段),每段派一个**只读** sub-agent,
+  对照该段 `_pages/` 里的 PNG 原图逐条核两类问题——
+  1. **与课件不符**:笔记说"课件说 X"、引用 `(p.N)`、数字 / 年份 / 例子 / 定义,原页不是这样
+  2. **讲解技术错误**:直觉、类比、例子、计算、常见坑、自测答案本身错误或误导新手(按该学科标准教材口径)
+  主线程逐条复核后修正;报告 `讲解核查: X 页 / 发现 N 条 / 已修 N 条`。
+  不支持 sub-agent 的环境由主线程分段自己核。**必须在 Step 5.5 删 PNG 之前做。**
 - **Tutorial 反向校验**(若同目录有对应 `T##*.md`):
-  1. Glob `01_Projects/<CODE>_课名/T*.md`,挑出 frontmatter `related:`
+  1. Glob `<COURSE_ROOT>/T*.md`,挑出 frontmatter `related:`
      字段含 `[[L##_*]]`(当前 lecture)的 tutorial 文件。无则跳过这条。
   2. 对每个匹配的 tutorial,收集它引用的知识点(两代格式都支持):
      - **新规范**:grep tutorial 里所有 `(X.Y)` 公式编号 → Read `_principles.md`
@@ -167,7 +177,7 @@ Read `_attachments/<pdf_stem>/full.md`,作为内容基础底稿。
 
 ```bash
 # 清理逐页 PNG(供 vision 用,自检通过后不再需要)
-rm -rf 01_Projects/<CODE>_课名/_attachments/_pages/
+rm -rf <COURSE_ROOT>/_attachments/_pages/
 ```
 
 **保留** `_attachments/<pdf_stem>/`(MinerU 抽的 markdown + 已重命名的图,这是图片唯一存档)。
@@ -191,7 +201,7 @@ rm -rf 01_Projects/<CODE>_课名/_attachments/_pages/
 
 ### Step 6.5: 更新 manifest.md(若存在)
 
-若 `01_Projects/<CODE>_课名/manifest.md` 存在:
+若 `<COURSE_ROOT>/manifest.md` 存在:
 
 1. 在 **Lectures 段**找对应 PDF 文件名那行(按第一列 `<PDF 名>` 匹配)
    - **找到该行** → Edit 那一行:
@@ -213,6 +223,7 @@ rm -rf 01_Projects/<CODE>_课名/_attachments/_pages/
 **Slides 覆盖**: X/Y(跳过 Z 页:课程信息页/装饰页)
 **术语自洽**: N/N(全部已定义或已链接)
 **讲透自检**: N/N 知识块达标(正文免责语 0 处)
+**讲解核查**: X 页 / 发现 N 条 / 已修 N 条
 **图片**: N 张嵌入
 **疑问汇总**:
 - (笔记里的疑问)
@@ -222,7 +233,7 @@ rm -rf 01_Projects/<CODE>_课名/_attachments/_pages/
 
 用户明说"生成完整 index / 结课整理 index / 升级 MOC"时走这里(不跑 Step 1-7):
 
-1. Glob `01_Projects/<CODE>_课名/L*.md` + `T*.md`,确认 lecture 齐了(缺很多就提醒用户,问要不要继续)
+1. Glob `<COURSE_ROOT>/L*.md` + `T*.md`,确认 lecture 齐了(缺很多就提醒用户,问要不要继续)
 2. Read 全部 L##(至少读每份的标题层级 + 核心公式段)+ 现有 index.md 的各 Week 疑问段
 3. 按 `assets/index-moc.md` **阶段③** 的 10 段结构**整体重写** index.md
    (这是唯一允许重写 index 的场合)
@@ -234,8 +245,10 @@ rm -rf 01_Projects/<CODE>_课名/_attachments/_pages/
 2. **不歪曲课件事实** — 课件里的数据 / 公式 / 定义 / 例子必须与原件一致;不把课件没说的内容说成"课件说"。这是唯一的准确性红线——**老师式讲解(直觉 / 例子 / 类比 / 补全课件只点名没解释的术语)不属于编造**,直接写正文,不加标记
 3. **延伸 callout 只放超范围内容** — `> [!tip] 延伸(非 PPT 内容)` 只用于后续章节 / 课外的新知识点,不用来装本讲的讲解
 4. **正文不写免责语** — 不写"原页未展开 / 不能读成 / 本页未说明"之类;能讲清就讲清,真存疑放 `## 我的疑问`
-5. **MOC 更新 append-only** — 不改已有 Week 段落(唯一例外:§结课 MOC 升级是显式整体重写)
-6. **质量核查服务于笔记,不喧宾夺主** — 用 skill 自带脚本;不额外自建 QA 脚本 / 报告体系,核查结果只写进 Step 7 报告
+5. **课件有错或过时,保留原说法 + 一句纠正** — 例:"1970 ALOHAnet(课件写作 satellite network;教材通行说法是连接各岛的无线电分组网)"。这是讲解,不是免责语;不要默默照抄错误,也不要默默改掉课件
+6. **页码引用必须核实** — 写 `(p.N)` 前确认该页确有此内容;一条信息跨页时写全页码(`p.41、p.44`)
+7. **MOC 更新 append-only** — 不改已有 Week 段落(唯一例外:§结课 MOC 升级是显式整体重写)
+8. **质量核查服务于笔记,不喧宾夺主** — 用 skill 自带脚本;不额外自建 QA 脚本 / 报告体系,核查结果只写进 Step 7 报告
 
 ## Reference index
 

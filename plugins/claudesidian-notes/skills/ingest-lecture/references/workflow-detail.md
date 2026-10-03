@@ -62,7 +62,18 @@
 
 **不做这一步的后果**：笔记本身没事（它用新名），但 `full.md` 在 Obsidian 里所有图全坏（指向已不存在的 hash 文件），留档的 full.md 也是坏的。
 
-- PowerShell 实操：读 full.md 内容 → 对块 2 清单每行做 `-replace [regex]::Escape($oldHash), $newName` → 写回。
+- 跨平台实操（Python，mv 和替换一起做）：
+
+```python
+from pathlib import Path
+d = Path("<COURSE_ROOT>/_attachments/<pdf_stem>")
+renames = {"<完整32位hash>.jpg": "<CODE>_L##_p06_xxx_concept.jpg", ...}  # 来自块 2 清单
+full = d / "full.md"; text = full.read_text(encoding="utf-8")
+for old, new in renames.items():
+    (d / "images" / old).rename(d / "images" / new)
+    text = text.replace(f"images/{old}", f"images/{new}")
+full.write_text(text, encoding="utf-8")
+```
 - 块 2 清单里的 hash 必须是**完整 32 位**（不是缩写），否则替换不到。
 
 ### 3. verify Read
@@ -105,6 +116,8 @@ Mermaid 图展示本讲核心概念关系。
 6. **类比**：有帮助就加（航空旅行 ↔ 分层），不硬凑
 7. **常见坑**：新手最容易理解错的地方，用 `> [!warning] 常见坑` 单独标出
 8. **课件只点了名、没解释的术语**（如 best effort、stateless、peering），**按标准教材口径直接讲清楚**——这是讲解，不是编造。不要写"本页未展开"了事
+9. **课件说法有错 / 过时**：保留课件原话，紧跟一句"教材通行说法是……"（括号或一句话即可）。既不默默照抄，也不默默改写
+10. **页码引用要准**：`(p.N)` 只写确认过的页；信息分散在几页时列全
 
 ### 术语定义
 
@@ -118,7 +131,8 @@ Mermaid 图展示本讲核心概念关系。
 
 | 内容 | 放哪 | 标记 |
 |---|---|---|
-| 课件里的事实、数据、公式、定义、例子 | 正文 | 无；需要时注页码 `(p.N)` 便于回溯 |
+| 课件里的事实、数据、公式、定义、例子 | 正文 | 无；需要时注页码 `(p.N)` 便于回溯（必须是核实过的页） |
+| 课件有错 / 过时的说法 | 正文，原说法后紧跟纠正 | 无，一句"教材通行说法是……" |
 | 老师式讲解：直觉、动机、例子、代入计算、类比、walk-through、常见坑 | 正文 | **无标记**——这是笔记主体，鼓励写 |
 | 超出本讲范围的新知识点（后续章节内容、课外拓展） | `> [!tip] 延伸(非 PPT 内容)` | 有 |
 | PPT 原文 | 末尾折叠 `> [!info]-` | — |
