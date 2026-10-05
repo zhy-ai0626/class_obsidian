@@ -5,6 +5,14 @@ description: 解一份 tutorial/习题集/往年考卷,产出教学质量解答(
 
 # Skill: ingest-tutorial
 
+> [!important] 多课程总 vault 约定（v0.1.4 起）
+> 所有课程可能在同一个 vault 里（如 `~/University/<学期>/<CODE> 课名/`），所以：
+> - 中枢文件一律带课程前缀：`<CODE>_index.md`、`<CODE>_manifest.md`、`<CODE>_principles.md`；双链写 `[[<CODE>_principles#...]]`，**不要**写裸名 `[[index]]` / `[[_principles]]`。读旧课程时若只有无前缀的 `index.md` / `_principles.md`，照旧使用，不擅自改名。
+> - 可能跨课重名的笔记名（如 `L00_course_information`）加课程代码：`L00_<CODE>_course_information`。
+> - 过程文件（TASK_STATE、质量报告、临时脚本、_work 目录）写到 vault 根的 `_meta/<CODE>/`（存在时），不放进 COURSE_ROOT；原始资料在 `_sources/<学期>/<CODE>/`（存在时）。
+> - Dataview 查询的 `FROM` 写完整课程路径，不写 `FROM "/"`。
+> - MinerU token：脚本从当前目录逐级向上找 `.env`，放在 vault 根即可。
+
 ## Role
 
 产出**教学质量的解答**,不只是答案。一份好的 tutorial 笔记做 4 件事:
@@ -82,15 +90,15 @@ cp "<tutorial_path>" "01_Projects/<CODE>_课名/_attachments/source/"
 
 ### Step 1.6: 从 manifest 加载参考资料索引
 
-Read `01_Projects/<CODE>_课名/manifest.md`(若存在),从 **References 段**拿到所有有 "MinerU 索引" 的资料路径:
+Read `01_Projects/<CODE>_课名/<CODE>_manifest.md`(若存在),从 **References 段**拿到所有有 "MinerU 索引" 的资料路径:
 
 - **解析方式**:References 表里每行,若 "MinerU 索引" 列是 `✅ <path>` → `<path>` 就是 grep-able 的 markdown
 - 对每个 `<path>`,**Read 前 100 行**了解资料目录(表号 / 物质 / 单位 / type)
 - **记住所有 (path, type) 对**,Step 4 按 type 优先级 grep(type=physprop 优先查物性;type=unitconv 优先查单位换算;type=textbook/handbook 兜底)
 
-**找不到 manifest.md 时**:
+**找不到 <CODE>_manifest.md 时**:
 - 检查 `_attachments/source/` 下有没有典型参考资料文件名(`Appendix*.pdf` / `Table*.pdf` / `Handbook*.pdf` / `*物性*.pdf` 等)
-- 有 → chat 提示用户:"发现 `<filename>` 是疑似参考资料但未处理,**建议先跑 MinerU + 建 manifest.md**,做 tutorial 时能自动查。要现在做吗?"——用户点头就按 `${CLAUDE_PLUGIN_ROOT}/shared/assets/manifest-example.md` 模板建
+- 有 → chat 提示用户:"发现 `<filename>` 是疑似参考资料但未处理,**建议先跑 MinerU + 建 <CODE>_manifest.md**,做 tutorial 时能自动查。要现在做吗?"——用户点头就按 `${CLAUDE_PLUGIN_ROOT}/shared/assets/manifest-example.md` 模板建
 - 没有 → 跳过,Step 4 走原 fallback("请核实")
 
 **注意**:
@@ -98,14 +106,14 @@ Read `01_Projects/<CODE>_课名/manifest.md`(若存在),从 **References 段**�
 - 只读 markdown,**不要为了找数据 vision 整本参考 PDF**——那是 grep 的事
 - **绝不写死任何文件名 glob**(`Appendix*` 之类),完全用 manifest 声明的路径——不同教材命名风格不同
 
-### Step 1.7: 加载 `_principles.md`(公式编号体系)
+### Step 1.7: 加载 `<CODE>_principles.md`(公式编号体系)
 
-Read `01_Projects/<CODE>_课名/_principles.md`(若存在),拿到整门课的**公式编号体系** (1.1)→(N.X)。
+Read `01_Projects/<CODE>_课名/<CODE>_principles.md`(若存在),拿到整门课的**公式编号体系** (1.1)→(N.X)。
 
 后续 Step 3 / 5 引用公式时,**优先用 _principles 的 (X.Y) 编号**,而不是 wikilink 回 lecture(老规范)。
 
-若 `_principles.md` 不存在:
-- chat 提示用户:`这门课还没有 _principles.md,建议先跑 distill-principles 生成。本次 tutorial 按老规范用 wikilink 引 lecture。`
+若 `<CODE>_principles.md` 不存在:
+- chat 提示用户:`这门课还没有 <CODE>_principles.md,建议先跑 distill-principles 生成。本次 tutorial 按老规范用 wikilink 引 lecture。`
 - 继续跑(降级到老规范),Step 7.6 跳过
 
 ### Step 2: 解析问题
@@ -122,12 +130,12 @@ Read `01_Projects/<CODE>_课名/_principles.md`(若存在),拿到整门课的**�
 
 | 公式 | 含义 | _principles 编号 |
 |---|---|---|
-| $J_A = -D_{AB} \frac{dc_A}{dz}$ | Fick 第一定律 | [[_principles#§1.2 Fick 第一定律\|(1.2)]] |
+| $J_A = -D_{AB} \frac{dc_A}{dz}$ | Fick 第一定律 | [[<CODE>_principles#§1.2 Fick 第一定律\|(1.2)]] |
 | $c_A = S\,p_A$ | Solution-Diffusion 致密膜 | ⚠️ _principles 缺 |
 
 规则:
 - 只列实际要用的(不超 ~10 个)
-- **优先引 _principles 公式编号** (X.Y) — 用 `[[_principles#§X.Y 标题\|(X.Y)]]` 形式
+- **优先引 _principles 公式编号** (X.Y) — 用 `[[<CODE>_principles#§X.Y 标题\|(X.Y)]]` 形式
 - _principles 没有的公式 → 标 `⚠️ _principles 缺` 并记到 Step 7.6 bug 报告
 - **不再用 wikilink 引 lecture**（lecture 是 _principles 上游，校验回 _principles 更高效）
 - 例外：物理意义 / 推导图等 _principles 没有的内容,wikilink 回 lecture 看图
@@ -181,23 +189,23 @@ Read `01_Projects/<CODE>_课名/_principles.md`(若存在),拿到整门课的**�
 - 题目要用但相关 lecture 笔记弱(或没有)的概念
 - 题目隐含但用户可能没意识的:"Problem 2 第二部分默认你知道 Clausius-Clapeyron,虽然题目没点名"
 
-### Step 7.5: 更新 manifest.md(若存在)
+### Step 7.5: 更新 <CODE>_manifest.md(若存在)
 
-若 `01_Projects/<CODE>_课名/manifest.md` 存在:
+若 `01_Projects/<CODE>_课名/<CODE>_manifest.md` 存在:
 1. 找 Tutorials 表中对应原 PDF 文件名的那行(按 `<Tutorial 文件名>` 列匹配)
 2. 把"笔记"列从 `–` 改为 `✅ [[T##_topic_snake]]`
 3. 若本次跑了 MinerU(罕见,见 Step 1.6 例外路径),把"MinerU 索引"列也改成 `✅ <path>`
 4. 在文件末尾"修改记录"段追加一行:`YYYY-MM-DD: ingest-tutorial 更新 <Tutorial 文件名> 的笔记列`
 
-若 manifest.md 不存在:**跳过**,不强制建。在 Step 8 报告里提示用户"考虑建 manifest.md 跟踪状态"。
+若 <CODE>_manifest.md 不存在:**跳过**,不强制建。在 Step 8 报告里提示用户"考虑建 <CODE>_manifest.md 跟踪状态"。
 
-⚠️ **不要**修改 manifest.md 其他行/段——只动你刚处理的那行。
+⚠️ **不要**修改 <CODE>_manifest.md 其他行/段——只动你刚处理的那行。
 
 ### Step 7.6: `_principles` 反向校验(**新规范核心**)
 
-tutorial 写完后,自动跟 `_principles.md` 对账:Read _principles → grep tutorial 里所有 (X.Y) 引用 → 逐一验证 _principles 里 `\tag{X.Y}` 是否存在 → 不存在的 + Step 3 标 `⚠️ _principles 缺` 的 → 汇总成 bug 报告写到 tutorial 末尾(`## 知识盲区` 之后),chat 提示用户要不要重蒸馏。
+tutorial 写完后,自动跟 `<CODE>_principles.md` 对账:Read _principles → grep tutorial 里所有 (X.Y) 引用 → 逐一验证 _principles 里 `\tag{X.Y}` 是否存在 → 不存在的 + Step 3 标 `⚠️ _principles 缺` 的 → 汇总成 bug 报告写到 tutorial 末尾(`## 知识盲区` 之后),chat 提示用户要不要重蒸馏。
 
-`_principles.md` 不存在则跳过本步,在 Step 8 报告里提示先跑 distill-principles。
+`<CODE>_principles.md` 不存在则跳过本步,在 Step 8 报告里提示先跑 distill-principles。
 
 → 完整 7 步流程 + bug 报告模板见 `references/workflow-detail.md` §Step 7.6
 

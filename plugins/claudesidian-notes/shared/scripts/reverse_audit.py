@@ -8,7 +8,7 @@
     python scripts/reverse_audit.py <path_to_tutorial.md>
     python scripts/reverse_audit.py <path_to_tutorial.md> <path_to_principles.md>
 
-不指定 _principles.md 时自动找同目录的 _principles.md。
+不指定时自动找同目录的 <CODE>_principles.md（总 vault 命名），找不到再找旧名 _principles.md。
 
 退出码: 0 = 全通过, 1 = 有 bug, 2 = _principles.md 不存在
 """
@@ -25,7 +25,11 @@ def main() -> None:
     if not tutorial.exists():
         sys.exit(f"ERROR: tutorial 不存在 {tutorial}")
 
-    principles = Path(sys.argv[2]) if len(sys.argv) >= 3 else tutorial.parent / "_principles.md"
+    if len(sys.argv) >= 3:
+        principles = Path(sys.argv[2])
+    else:
+        prefixed = sorted(tutorial.parent.glob("*_principles.md"))
+        principles = prefixed[0] if prefixed else tutorial.parent / "_principles.md"
 
     if not principles.exists():
         print(f"⚠️  _principles.md 不存在 ({principles})")

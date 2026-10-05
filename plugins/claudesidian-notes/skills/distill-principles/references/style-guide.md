@@ -1,6 +1,6 @@
 # 教科书风格规则
 
-`_principles.md` 是**教科书风格**，不是 callout 堆砌。下面是从 CME213 v1→v4 摸出来的硬规则。
+`<CODE>_principles.md` 是**教科书风格**，不是 callout 堆砌。下面是从 CME213 v1→v4 摸出来的硬规则。
 
 ## 必须遵守
 

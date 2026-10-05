@@ -1,9 +1,17 @@
 ---
 name: ingest-lecture
-description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知识块组织的课程笔记,写入课程文件夹 <COURSE_ROOT>/L##.md,并更新 index.md 和 manifest.md。只要用户提到"整理这节课 / 处理这份 PPT / 把 slides 变成笔记 / ingest lecture / process slides",或附上课程 PPT/PDF 要做笔记,就用本 skill,即使没说"ingest"。用户说"生成完整 index / 结课整理 index / 升级 MOC"也用本 skill（走 §结课 MOC 升级独立入口,不跑常规步骤）。不要用于:tutorial/习题（→ ingest-tutorial）、科研论文（→ ingest-paper）、要交的作业报告（→ chemeng-coursework plugin）。
+description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知识块组织的课程笔记,写入课程文件夹 <COURSE_ROOT>/L##.md,并更新 <CODE>_index.md 和 <CODE>_manifest.md。只要用户提到"整理这节课 / 处理这份 PPT / 把 slides 变成笔记 / ingest lecture / process slides",或附上课程 PPT/PDF 要做笔记,就用本 skill,即使没说"ingest"。用户说"生成完整 index / 结课整理 index / 升级 MOC"也用本 skill（走 §结课 MOC 升级独立入口,不跑常规步骤）。不要用于:tutorial/习题（→ ingest-tutorial）、科研论文（→ ingest-paper）、要交的作业报告（→ chemeng-coursework plugin）。
 ---
 
 # Skill: ingest-lecture
+
+> [!important] 多课程总 vault 约定（v0.1.4 起）
+> 所有课程可能在同一个 vault 里（如 `~/University/<学期>/<CODE> 课名/`），所以：
+> - 中枢文件一律带课程前缀：`<CODE>_index.md`、`<CODE>_manifest.md`、`<CODE>_principles.md`；双链写 `[[<CODE>_principles#...]]`，**不要**写裸名 `[[index]]` / `[[_principles]]`。读旧课程时若只有无前缀的 `index.md` / `_principles.md`，照旧使用，不擅自改名。
+> - 可能跨课重名的笔记名（如 `L00_course_information`）加课程代码：`L00_<CODE>_course_information`。
+> - 过程文件（TASK_STATE、质量报告、临时脚本、_work 目录）写到 vault 根的 `_meta/<CODE>/`（存在时），不放进 COURSE_ROOT；原始资料在 `_sources/<学期>/<CODE>/`（存在时）。
+> - Dataview 查询的 `FROM` 写完整课程路径，不写 `FROM "/"`。
+> - MinerU token：脚本从当前目录逐级向上找 `.env`，放在 vault 根即可。
 
 ## Role
 
@@ -25,20 +33,20 @@ description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知�
 
 - Lecture 材料(PPT / PDF / 文本 / 图片)
 - **课程代码** + **周次** + **lecture 编号**(缺则问一次,不猜)
-- **COURSE_ROOT**:课程文件夹。用户给了路径就用它(可以在桌面等任意位置);没给时默认 vault 下 `01_Projects/<CODE>_课名/`
+- **COURSE_ROOT**:课程文件夹。用户给了路径就用它(可以在桌面等任意位置);没给时默认 vault 下 `01_Projects/<CODE>_课名/`（总 vault 布局下为 `<学期>/<CODE> 课名/`）
 - 可选:日期 / 标题
 
 ## Outputs
 
 1. `<COURSE_ROOT>/L##_topic_snake.md`(1 个文件)
-2. 更新 `<COURSE_ROOT>/index.md`(MOC,增量追加 Week 段落)
+2. 更新 `<COURSE_ROOT>/<CODE>_index.md`(MOC,增量追加 Week 段落)
 
 ## Dependencies
 
 启动时读:
 - `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/lecture-topic.md`(笔记模板)
-- `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/index-moc.md`(index.md 三阶段模板:桩 / Week 追加 / 结课完整 MOC)
-- `<COURSE_ROOT>/index.md`(MOC,若存在)
+- `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/index-moc.md`(<CODE>_index.md 三阶段模板:桩 / Week 追加 / 结课完整 MOC)
+- `<COURSE_ROOT>/<CODE>_index.md`(MOC,若存在)
 
 工具:
 - `${CLAUDE_PLUGIN_ROOT}/shared/scripts/mineru_extract.py`(PDF → markdown + images,用 MinerU API)
@@ -52,10 +60,10 @@ description: 把一份 lecture 材料（.pptx/.pdf/截图/文本）整理成知�
 ### Step 1: 加载上下文
 
 1. 检查 `<COURSE_ROOT>/` 是否存在;若不存在,**问用户**
-   课程名 + 学期,创建文件夹 + 桩 `index.md`(按 `assets/index-moc.md` **阶段①**格式)。
+   课程名 + 学期,创建文件夹 + 桩 `<CODE>_index.md`(按 `assets/index-moc.md` **阶段①**格式)。
 2. 读 MOC 看历史(domain_tags / 之前的 Week)。
 3. 加载 `${CLAUDE_PLUGIN_ROOT}/skills/ingest-lecture/assets/lecture-topic.md`。
-4. **Read `manifest.md`(若存在)** —— 看 Lectures 段是否有本次要处理的 PDF 那行(下次 Step 6.5 要更新它)。若整份 manifest 不存在,**不强制建**,只在 Step 7 报告里提示用户考虑建一份。
+4. **Read `<CODE>_manifest.md`(若存在)** —— 看 Lectures 段是否有本次要处理的 PDF 那行(下次 Step 6.5 要更新它)。若整份 manifest 不存在,**不强制建**,只在 Step 7 报告里提示用户考虑建一份。
 
 ### Step 1.5: 归档原始材料(PDF / PPT)
 
@@ -156,7 +164,7 @@ Read `_attachments/<pdf_stem>/full.md`,作为内容基础底稿。
   1. Glob `<COURSE_ROOT>/T*.md`,挑出 frontmatter `related:`
      字段含 `[[L##_*]]`(当前 lecture)的 tutorial 文件。无则跳过这条。
   2. 对每个匹配的 tutorial,收集它引用的知识点(两代格式都支持):
-     - **新规范**:grep tutorial 里所有 `(X.Y)` 公式编号 → Read `_principles.md`
+     - **新规范**:grep tutorial 里所有 `(X.Y)` 公式编号 → Read `<CODE>_principles.md`
        找到对应 `\tag{X.Y}` 公式,看该公式在 _principles 里标注的来源 lecture
        是否为当前 L##;是 → 该公式进校验清单
      - **老规范兜底**:grep 该 tutorial 全文 `[[L##_*]]`(公式速查来源列 +
@@ -184,7 +192,7 @@ rm -rf <COURSE_ROOT>/_attachments/_pages/
 
 ### Step 6: 增量 MOC 更新
 
-`index.md` **追加** Week 段落(不改已有;格式 = `assets/index-moc.md` **阶段②**):
+`<CODE>_index.md` **追加** Week 段落(不改已有;格式 = `assets/index-moc.md` **阶段②**):
 
 ```markdown
 ## Week {{WEEK}}
@@ -199,9 +207,9 @@ rm -rf <COURSE_ROOT>/_attachments/_pages/
 
 **Append-only**:不修改已有 Week 段落。
 
-### Step 6.5: 更新 manifest.md(若存在)
+### Step 6.5: 更新 <CODE>_manifest.md(若存在)
 
-若 `<COURSE_ROOT>/manifest.md` 存在:
+若 `<COURSE_ROOT>/<CODE>_manifest.md` 存在:
 
 1. 在 **Lectures 段**找对应 PDF 文件名那行(按第一列 `<PDF 名>` 匹配)
    - **找到该行** → Edit 那一行:
@@ -210,7 +218,7 @@ rm -rf <COURSE_ROOT>/_attachments/_pages/
    - **没找到该行**(用户没在 manifest 预登记) → 在 Lectures 表末尾**追加新行**
 2. 在文件末尾"修改记录"段追加一行:`YYYY-MM-DD: ingest-lecture 更新 <PDF 文件名>`
 
-若 manifest.md **不存在**:跳过本步,Step 7 报告里提示用户"考虑建 manifest.md 跟踪状态"——用户点头就按 `${CLAUDE_PLUGIN_ROOT}/shared/assets/manifest-example.md` 模板建。
+若 <CODE>_manifest.md **不存在**:跳过本步,Step 7 报告里提示用户"考虑建 <CODE>_manifest.md 跟踪状态"——用户点头就按 `${CLAUDE_PLUGIN_ROOT}/shared/assets/manifest-example.md` 模板建。
 
 ⚠️ **只动你刚处理的那一行 + 修改记录段**。不要碰其他课程笔记的行,不要重排表格,不要改 Tutorials / References 段。
 
@@ -234,8 +242,8 @@ rm -rf <COURSE_ROOT>/_attachments/_pages/
 用户明说"生成完整 index / 结课整理 index / 升级 MOC"时走这里(不跑 Step 1-7):
 
 1. Glob `<COURSE_ROOT>/L*.md` + `T*.md`,确认 lecture 齐了(缺很多就提醒用户,问要不要继续)
-2. Read 全部 L##(至少读每份的标题层级 + 核心公式段)+ 现有 index.md 的各 Week 疑问段
-3. 按 `assets/index-moc.md` **阶段③** 的 10 段结构**整体重写** index.md
+2. Read 全部 L##(至少读每份的标题层级 + 核心公式段)+ 现有 <CODE>_index.md 的各 Week 疑问段
+3. 按 `assets/index-moc.md` **阶段③** 的 10 段结构**整体重写** <CODE>_index.md
    (这是唯一允许重写 index 的场合)
 4. 写完报告:Phase 划分 / 覆盖 lecture 数 / 疑问汇总条数,让用户审
 
@@ -255,7 +263,7 @@ rm -rf <COURSE_ROOT>/_attachments/_pages/
 | 文件 | 何时翻 |
 |---|---|
 | `assets/lecture-topic.md` | Step 4 写 L## 笔记时的模板 |
-| `assets/index-moc.md` | 一切 index.md 操作:Step 1 建桩(阶段①)/ Step 6 追加 Week(阶段②)/ §结课 MOC 升级(阶段③) |
-| `../../shared/assets/manifest-example.md` | 给课程新建 manifest.md 时照抄 |
+| `assets/index-moc.md` | 一切 <CODE>_index.md 操作:Step 1 建桩(阶段①)/ Step 6 追加 Week(阶段②)/ §结课 MOC 升级(阶段③) |
+| `../../shared/assets/manifest-example.md` | 给课程新建 <CODE>_manifest.md 时照抄 |
 | `references/workflow-detail.md` | 改 sub-agent 协议（§3b 块 1/2/3 字段）/ 主线程聚合三步细节（§3c）/ 笔记模板规则（§4 frontmatter / 知识块 / 术语 / 图片嵌入 / 内容层次） |
 | `references/lessons.md` | 遇到怪现象先查 Failure modes 表 / 写笔记前看 Good 示例对齐风格 |

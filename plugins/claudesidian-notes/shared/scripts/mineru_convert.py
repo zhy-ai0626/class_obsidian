@@ -66,8 +66,9 @@ import utils  # noqa: F401 — UTF-8 reconfigure
 from utils.paper_id import parse_pdf_filename
 from utils.si_helpers import init_meta, save_meta, update_meta_status
 
-# 按优先级找 .env：① 运行目录（skill 都是从 vault 根调本脚本）② 脚本旁边
-load_dotenv(Path.cwd() / ".env")
+# 按优先级找 .env：① 运行目录及上层目录（load_dotenv 不覆盖已设置的值，近者优先）② 脚本旁边
+for _d in (Path.cwd(), *Path.cwd().parents):
+    load_dotenv(_d / ".env")
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 console = Console()

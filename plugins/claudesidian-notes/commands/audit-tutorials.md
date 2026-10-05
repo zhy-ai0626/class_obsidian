@@ -1,5 +1,5 @@
 ---
-description: 批量跑反向校验。扫一门课所有 T## tutorial，跟 _principles.md 对账，汇总 bug 报告。用法：/audit-tutorials CMEXXX
+description: 批量跑反向校验。扫一门课所有 T## tutorial，跟 <CODE>_principles.md 对账，汇总 bug 报告。用法：/audit-tutorials CMEXXX
 ---
 
 # /audit-tutorials
@@ -27,7 +27,7 @@ description: 批量跑反向校验。扫一门课所有 T## tutorial，跟 _prin
    ```
    若 0 个 tutorial → 报告"该课无 tutorial，无需 audit"，结束。
 
-3. **检查 _principles.md 是否存在**：
+3. **检查 <CODE>_principles.md 是否存在**：
    - 不存在 → 提示"先跑 distill-principles <CODE> 生成 _principles，再来 audit"，结束。
    - 存在 → 继续。
 

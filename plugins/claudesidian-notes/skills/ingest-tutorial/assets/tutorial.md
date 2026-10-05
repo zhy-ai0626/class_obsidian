@@ -27,7 +27,7 @@ topics: []
 
 | 公式 | 含义 | _principles 编号 |
 |------|------|------|
-| $...$ | ... | [[_principles#§X.Y 标题\|(X.Y)]] |
+| $...$ | ... | [[<CODE>_principles#§X.Y 标题\|(X.Y)]] |
 | $...$ | ... | ⚠️ _principles 缺 |
 
 ## 本次数据与常数

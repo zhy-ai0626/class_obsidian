@@ -1,9 +1,17 @@
 ---
 name: distill-principles
-description: 把一门课的所有 lecture 笔记蒸馏成一份"第一原理 + 推导树 + 公式索引"总览（_principles.md），按守恒 / 公理 → 派生公式组织。Triggers - "蒸馏 CMEXXX" / "把 XXX 课读薄" / "做 XXX 的原理图谱" / "distill principles" / "生成 XXX 的 _principles"。
+description: 把一门课的所有 lecture 笔记蒸馏成一份"第一原理 + 推导树 + 公式索引"总览（<CODE>_principles.md），按守恒 / 公理 → 派生公式组织。Triggers - "蒸馏 CMEXXX" / "把 XXX 课读薄" / "做 XXX 的原理图谱" / "distill principles" / "生成 XXX 的 _principles"。
 ---
 
 # Skill: distill-principles
+
+> [!important] 多课程总 vault 约定（v0.1.4 起）
+> 所有课程可能在同一个 vault 里（如 `~/University/<学期>/<CODE> 课名/`），所以：
+> - 中枢文件一律带课程前缀：`<CODE>_index.md`、`<CODE>_manifest.md`、`<CODE>_principles.md`；双链写 `[[<CODE>_principles#...]]`，**不要**写裸名 `[[index]]` / `[[_principles]]`。读旧课程时若只有无前缀的 `index.md` / `_principles.md`，照旧使用，不擅自改名。
+> - 可能跨课重名的笔记名（如 `L00_course_information`）加课程代码：`L00_<CODE>_course_information`。
+> - 过程文件（TASK_STATE、质量报告、临时脚本、_work 目录）写到 vault 根的 `_meta/<CODE>/`（存在时），不放进 COURSE_ROOT；原始资料在 `_sources/<学期>/<CODE>/`（存在时）。
+> - Dataview 查询的 `FROM` 写完整课程路径，不写 `FROM "/"`。
+> - MinerU token：脚本从当前目录逐级向上找 `.env`，放在 vault 根即可。
 
 ## Role
 
@@ -20,17 +28,17 @@ description: 把一门课的所有 lecture 笔记蒸馏成一份"第一原理 + 
 ## Inputs / Outputs
 
 - **In**：课程代码 + 课名（缺则问一次）；该课程 L01-L1N lecture 笔记；可选 Formula Sheet / Appendix
-- **Out**：`01_Projects/<CODE>_课名/_principles.md`（200-400 行）
+- **Out**：`01_Projects/<CODE>_课名/<CODE>_principles.md`（200-400 行）
 
 ## Dependencies
 
-启动读：`L*.md`、`manifest.md`（若存在）、`manifest.md` References 段标 ✅ 的资料
+启动读：`L*.md`、`<CODE>_manifest.md`（若存在）、`<CODE>_manifest.md` References 段标 ✅ 的资料
 
 ## Workflow
 
 ### Step 1: Glob lecture + manifest
 
-`Glob L*.md`，统计 lecture 数。Read `manifest.md`。
+`Glob L*.md`，统计 lecture 数。Read `<CODE>_manifest.md`。
 
 ⚠️ **不要只看 revision / 速查卡节** — 必须 Step 1.5 全文扫公式。
 
@@ -73,7 +81,7 @@ Glob `T*.md`。每个 tutorial 的 `## 本次公式速查` 段 → 加到大清�
 ### Step 6: 自检（跑脚本自动校验）
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/shared/scripts/validate_principles.py 01_Projects/<CODE>_课名/_principles.md
+python ${CLAUDE_PLUGIN_ROOT}/shared/scripts/validate_principles.py 01_Projects/<CODE>_课名/<CODE>_principles.md
 ```
 
 脚本自动检查:
@@ -88,7 +96,7 @@ python ${CLAUDE_PLUGIN_ROOT}/shared/scripts/validate_principles.py 01_Projects/<
 
 ```markdown
 ## Distill complete: <CODE>
-**文件**: [[_principles]]
+**文件**: [[<CODE>_principles]]
 **覆盖**: L01-L1N 全部 N 节
 **根本起点**: M 条
 **公式总数**: K 个（(1.1) → (N+1.X)）
@@ -111,7 +119,7 @@ python ${CLAUDE_PLUGIN_ROOT}/shared/scripts/validate_principles.py 01_Projects/<
 
 | 文件 | 用 |
 |---|---|
-| `assets/template.md` | `_principles.md` 完整结构模板 + 符号表 schema + 编号约定。Step 4 写文件时按这个 |
+| `assets/template.md` | `<CODE>_principles.md` 完整结构模板 + 符号表 schema + 编号约定。Step 4 写文件时按这个 |
 
 ### `../../shared/scripts/`（plugin 共享，LLM 用 Bash 调用）
 

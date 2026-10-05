@@ -56,9 +56,9 @@ SKILL.md 里压缩过的步骤,这里放完整规则。
 
 ## §Step 7.6 — `_principles` 反向校验(新规范核心)
 
-tutorial 写完后,自动跟 `_principles.md` 对账:
+tutorial 写完后,自动跟 `<CODE>_principles.md` 对账:
 
-1. **Read** `01_Projects/<CODE>_课名/_principles.md`(若不存在 → 跳过本 Step,Step 8 报告里提示用户"先跑 `distill-principles` 生成 _principles")
+1. **Read** `01_Projects/<CODE>_课名/<CODE>_principles.md`(若不存在 → 跳过本 Step,Step 8 报告里提示用户"先跑 `distill-principles` 生成 _principles")
 2. **grep tutorial 文件**所有形如 `(X.Y)` 的公式编号引用(包括 Step 3 公式速查表的"_principles 编号"列、Step 5 各题的"用到公式"行、解答正文)
 3. 对每个 (X.Y) 引用,**grep _principles** 验证 `\\tag\{X\.Y\}` 是否存在
 4. **不存在的**编号 → 记到下面 bug 报告
@@ -70,7 +70,7 @@ tutorial 写完后,自动跟 `_principles.md` 对账:
 ```markdown
 ## 给 `distill-principles` 的反馈(_principles bug 报告)
 
-做本 tutorial 时发现 [[_principles]] 缺/不一致以下内容,下次蒸馏要补:
+做本 tutorial 时发现 [[<CODE>_principles]] 缺/不一致以下内容,下次蒸馏要补:
 
 | 缺漏 / 冲突 | 哪几题用到 | 建议补到 _principles |
 |---|---|---|

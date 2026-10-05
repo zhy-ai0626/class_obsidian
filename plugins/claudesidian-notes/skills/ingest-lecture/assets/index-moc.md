@@ -1,8 +1,8 @@
-# index.md 模板（课程 MOC）
+# <CODE>_index.md 模板（课程 MOC）
 
-> 这文件给 LLM 看：生成 / 更新任何课程的 `index.md` 时按这里的格式，不要去翻别的课程抄。
+> 这文件给 LLM 看：生成 / 更新任何课程的 `<CODE>_index.md` 时按这里的格式，不要去翻别的课程抄。
 
-index.md 的一生分三个阶段：
+<CODE>_index.md 的一生分三个阶段：
 
 | 阶段 | 什么时候 | 谁做 |
 |---|---|---|
@@ -64,7 +64,7 @@ last_updated: YYYY-MM-DD
 
 ## 阶段 ③：结课完整 MOC（显式触发才做）
 
-用户明说"生成完整 index / 结课整理 index / 升级 MOC"时，**整体重写** index.md
+用户明说"生成完整 index / 结课整理 index / 升级 MOC"时，**整体重写** <CODE>_index.md
 （这是唯一允许重写的场合，append-only 规则不适用）。前提：全部 L##（最好还有 T##）已生成。
 
 ### 结构（按顺序，10 段）

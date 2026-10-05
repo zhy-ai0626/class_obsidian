@@ -41,11 +41,11 @@
 
 用户："蒸馏 CME222 传质"
 
-→ Step 1: Glob L01-L09 + manifest.md
+→ Step 1: Glob L01-L09 + <CODE>_manifest.md
 → **Step 1.5: 逐节 Read L01-L09 + grep `$$` 列大清单**（关键！别偷懒）
 → Step 1.6: 读已有 T*.md 公式速查表 → 补到大清单
 → Step 2: 识别根本起点（Fick 1st/2nd、连续性方程、对流-扩散方程）
 → Step 3: 推导树（稳态 1D 扩散 / 非稳态 / 边界层 / 双膜模型...）
-→ Step 4-5: Write `_principles.md` 教科书风格（按 `template.md` 结构 + `style-guide.md` 规则）
+→ Step 4-5: Write `<CODE>_principles.md` 教科书风格（按 `template.md` 结构 + `style-guide.md` 规则）
 → Step 6: 自检（编号序列 / 符号覆盖 / 行数 / 无 callout）
 → Step 7: 报告评分预期 8.5-9.5

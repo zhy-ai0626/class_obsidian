@@ -1,10 +1,10 @@
 ---
-description: 扫所有 CME* 课程，批量跑 distill-principles 蒸馏所有还没 _principles.md 的课。期末复习前一键搞定。
+description: 扫所有 CME* 课程，批量跑 distill-principles 蒸馏所有还没 <CODE>_principles.md 的课。期末复习前一键搞定。
 ---
 
 # /distill-all
 
-批量蒸馏所有 CME 课程的 `_principles.md`。
+批量蒸馏所有 CME 课程的 `<CODE>_principles.md`。
 
 ## 执行步骤
 
@@ -16,7 +16,7 @@ description: 扫所有 CME* 课程，批量跑 distill-principles 蒸馏所有�
 
 2. **筛选**：对每门课
    - 检查 `01_Projects/<CODE>_*/L*.md` 是否存在（至少 1 节 lecture，否则没东西可蒸馏）
-   - 检查 `01_Projects/<CODE>_*/_principles.md` 是否已存在
+   - 检查 `01_Projects/<CODE>_*/<CODE>_principles.md` 是否已存在
      - **存在** → 列入"已蒸馏"，问用户要不要重蒸馏（默认跳过）
      - **不存在** → 列入"待蒸馏"
 

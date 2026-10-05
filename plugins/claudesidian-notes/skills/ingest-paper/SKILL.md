@@ -5,6 +5,14 @@ description: 把一篇论文（main + 多格式 SI）转成 markdown，含 visio
 
 # Skill: ingest-paper
 
+> [!important] 多课程总 vault 约定（v0.1.4 起）
+> 所有课程可能在同一个 vault 里（如 `~/University/<学期>/<CODE> 课名/`），所以：
+> - 中枢文件一律带课程前缀：`<CODE>_index.md`、`<CODE>_manifest.md`、`<CODE>_principles.md`；双链写 `[[<CODE>_principles#...]]`，**不要**写裸名 `[[index]]` / `[[_principles]]`。读旧课程时若只有无前缀的 `index.md` / `_principles.md`，照旧使用，不擅自改名。
+> - 可能跨课重名的笔记名（如 `L00_course_information`）加课程代码：`L00_<CODE>_course_information`。
+> - 过程文件（TASK_STATE、质量报告、临时脚本、_work 目录）写到 vault 根的 `_meta/<CODE>/`（存在时），不放进 COURSE_ROOT；原始资料在 `_sources/<学期>/<CODE>/`（存在时）。
+> - Dataview 查询的 `FROM` 写完整课程路径，不写 `FROM "/"`。
+> - MinerU token：脚本从当前目录逐级向上找 `.env`，放在 vault 根即可。
+
 ## Role
 
 把一篇论文转成**对 AI 友好**的结构化 markdown：

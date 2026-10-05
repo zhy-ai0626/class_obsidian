@@ -9,9 +9,9 @@
 | 模式 | 触发 | 处理 |
 |---|---|---|
 | PDF 读 password-protected 误报 | Read 工具说 PDF 加密但实际未加密 | 改用 `PyMuPDF`（`import fitz`）提取 |
-| 课程文件夹不存在 | COURSE_ROOT 不存在 | 问用户课程名 + 学期，创建文件夹 + index.md，**不擅自猜** |
+| 课程文件夹不存在 | COURSE_ROOT 不存在 | 问用户课程名 + 学期，创建文件夹 + <CODE>_index.md，**不擅自猜** |
 | extract_images.py 失败 | PPT 解析错 / 0 图 | WARN，继续生成笔记（无图嵌入），报告用户 |
-| MOC 已存在但 frontmatter 不合规 | index.md 缺 frontmatter | WARN，只追加 Week 段，**不修 frontmatter** |
+| MOC 已存在但 frontmatter 不合规 | <CODE>_index.md 缺 frontmatter | WARN，只追加 Week 段，**不修 frontmatter** |
 | 一讲多 PDF/PPT | 用户传多份附件 | 逐份提取后合并到**同一笔记**；不为每份生成独立笔记 |
 | **忠实转录化**(CST309 L01, 2026-10) | 提示词里有"不得补写原资料没有的内容",或模型把"准确性优先"理解成"只转述 slide"→ 笔记充满"原页未展开 / 不能读成"(L01 一份约 40 处),延伸讲解 0 处,"Stateless routers"只写"不能读成路由器没有状态"却不讲是什么 | 准确性红线只管"不歪曲课件事实";课件点名没解释的概念按教材口径讲清;Step 5 讲透自检 grep 免责语应为 0 |
 | 教学内容被拆出正文 | 把直觉 / 例子 / 自测挪到单独 quickref,正文"回到贴近 PPT" | 讲解属于正文主体;quickref 可以另做,但不能以掏空正文为代价 |

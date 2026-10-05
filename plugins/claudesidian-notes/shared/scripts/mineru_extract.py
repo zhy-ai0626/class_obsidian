@@ -35,8 +35,9 @@ def load_env_token() -> str:
     .env 格式:MINERU_API_TOKEN=eyJ0eXBlIjoiSldUIiwi...
     简单解析,不依赖 python-dotenv 包。
     """
-    # 按优先级找 .env：① 运行目录（skill 都是从 vault 根调本脚本）② 脚本旁边
-    candidates = [Path.cwd() / ".env", Path(__file__).resolve().parent / ".env"]
+    # 运行目录及其各级上层（课程在总 vault 子目录里时，.env 在 vault 根）
+    candidates = [d / ".env" for d in (Path.cwd(), *Path.cwd().parents)]
+    candidates.append(Path(__file__).resolve().parent / ".env")
     for env_path in candidates:
         if not env_path.exists():
             continue

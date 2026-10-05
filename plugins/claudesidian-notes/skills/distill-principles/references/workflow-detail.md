@@ -105,4 +105,4 @@ Glob `01_Projects/<CODE>_课名/T*.md`。对每个存在的 tutorial:
 - [ ] 公式索引末尾对得上所有 (X.Y)
 - [ ] Step 1.5 大清单的所有公式都进了 _principles 或明示"不进"
 
-**编号校验**：`grep -oP '\\tag\{[0-9.]+\}' _principles.md | sort -V` 看序列是否连续。
+**编号校验**：`grep -oP '\\tag\{[0-9.]+\}' <CODE>_principles.md | sort -V` 看序列是否连续。
