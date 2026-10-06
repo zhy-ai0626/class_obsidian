@@ -294,10 +294,32 @@ def _poll_batch_with_progress(
 
 
 def _download_zip_bytes(url: str) -> bytes:
-    """下载 zip 到内存。"""
-    resp = _request_with_retry(
-        "GET", url, timeout=DOWNLOAD_TIMEOUT_SEC, stream=True
-    )
+    """下载 zip 到内存。
+
+    结果链接是公开地址、不带 token。先校验证书；若证书校验失败
+    （如 2026-10 cdn-mineru.openxlab.org.cn 证书过期），仅对这次下载降级为
+    verify=False 重试并打印警告。带 token 的 API 请求始终校验证书。
+    """
+    try:
+        resp = requests.get(url, timeout=DOWNLOAD_TIMEOUT_SEC, stream=True)
+    except requests.exceptions.SSLError as e:
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        console.print(
+            f"[yellow]⚠️ 下载地址证书校验失败（{type(e).__name__}），该链接不含 token，"
+            f"降级为不校验证书重试：{url.split('/')[2]}[/]"
+        )
+        resp = _request_with_retry(
+            "GET", url, timeout=DOWNLOAD_TIMEOUT_SEC, stream=True, verify=False
+        )
+    except (
+        requests.exceptions.ConnectionError,
+        requests.exceptions.Timeout,
+        requests.exceptions.ChunkedEncodingError,
+    ):
+        resp = _request_with_retry(
+            "GET", url, timeout=DOWNLOAD_TIMEOUT_SEC, stream=True
+        )
     resp.raise_for_status()
     return resp.content
 
