@@ -1,6 +1,6 @@
 ---
 name: ingest-tutorial
-description: 解一份 tutorial/习题集/往年考卷,产出教学质量解答(公式速查引 _principles 编号 + 量级估算 + 一气呵成推导 + English Concise Answer + 知识盲区报告),写入 01_Projects/<CODE>_课名/T##.md。只要用户说"解这份 tutorial / 做这份习题 / 解 T05 / 做练习 / solve these problems / 把这份 past paper 做一遍",或附上习题 PDF/图片/含答案的 .doc,就用本 skill。不要用于:要提交计分的作业(拒绝代解,引导到复习概念/做相似题,正式作业走 chemeng-coursework)、lecture 材料(→ ingest-lecture)。模糊说"help with homework"时先问是练习还是要交的。
+description: 解一份 tutorial/习题集/往年考卷,产出教学质量解答(每题固定版式:中文翻译 → 原题 PDF 截图 → 关键公式/规则/概念 → 已知条件 → 分步解题 → 答案框,易错与 English 折叠;外加答案速查 + 知识盲区报告),写入 01_Projects/<CODE>_课名/T##.md。只要用户说"解这份 tutorial / 做这份习题 / 解 T05 / 做练习 / solve these problems / 把这份 past paper 做一遍",或附上习题 PDF/图片/含答案的 .doc,就用本 skill。不要用于:要提交计分的作业(拒绝代解,引导到复习概念/做相似题,正式作业走 chemeng-coursework)、lecture 材料(→ ingest-lecture)。模糊说"help with homework"时先问是练习还是要交的。
 ---
 
 # Skill: ingest-tutorial
@@ -18,7 +18,7 @@ description: 解一份 tutorial/习题集/往年考卷,产出教学质量解答(
 产出**教学质量的解答**,不只是答案。一份好的 tutorial 笔记做 4 件事:
 
 1. 上来汇总公式 + 数据(公式速查 + 数据表)
-2. 解释**为什么**这步这么做 + 量级估算反向校验(思路与估算)
+2. 每题按固定版式:先中文翻译,再放原题截图,紧接着列关键公式(或关键规则/关键概念)和已知条件,然后分步解题,最后一步验算
 3. 用 wikilink 引用涉及概念
 4. 列知识盲区(用户该复习哪些)
 
@@ -116,6 +116,12 @@ Read `01_Projects/<CODE>_课名/<CODE>_principles.md`(若存在),拿到整门课
 - chat 提示用户:`这门课还没有 <CODE>_principles.md,建议先跑 distill-principles 生成。本次 tutorial 按老规范用 wikilink 引 lecture。`
 - 继续跑(降级到老规范),Step 7.6 跳过
 
+### Step 1.8: 截取每题原题图(输入有 PDF/图片时)
+
+用 PyMuPDF 按题号定位,把每题裁成 200 DPI PNG,存 `_attachments/<tutorial stem>/images/T##_Q<n>_original.png`。**逐张看图核对**:不截进页眉/标题/上一题尾行/结尾标记,表格和子题完整。纯文本输入跳过,改用 `>` 引用块逐字抄原题。
+
+→ 定位规则 + 脚本 + 跨页处理见 `references/workflow-detail.md` §Step 1.8
+
 ### Step 2: 解析问题
 
 把输入拆成编号问题。每题识别:
@@ -162,17 +168,18 @@ Read `01_Projects/<CODE>_课名/<CODE>_principles.md`(若存在),拿到整门课
 **有 manifest 索引时优先 grep**——这是减少 "请核实" 数量、提高答案可用性的关键。
 **type 优先级**:physprop > textbook > handbook > unitconv (按题目需要选)。
 
-### Step 5: 逐题解答(方案 B — 中文主线 + 英文摘要)
+### Step 5: 逐题解答(固定版式)
 
-按 `${CLAUDE_PLUGIN_ROOT}/skills/ingest-tutorial/assets/tutorial.md` 结构,每题一条线性叙事:
+按 `${CLAUDE_PLUGIN_ROOT}/skills/ingest-tutorial/assets/tutorial.md` 结构。每题只有一个 `## Problem N` 标题,题内用 **粗体标签** 分段,**不开 `###` 小标题**(Obsidian 里字号太大)。顺序固定:
 
-- **> (原题)** verbatim + **中文翻译**(默认必带,短概念题可跳)
-- **用到公式**:列 `_principles` 编号 (X.Y),不用 wikilink 引概念
-- **解答**(中文,一气呵成):开头点明本质 → 量级估算内嵌 → 逐步推导(每步 motivation + 数学)→ 对照估算 → 结尾 `**最终答案**: ...(带单位)`,不开独立小节
-- **English Concise Answer**(默认必带):100–200 词段落,可直接抄考卷,完整句子非 bullet
-- **易错** + 可选 **变式**
+1. **中文翻译** — `>` 引用块整题翻译,表格也译,术语写「中文(English)」
+2. **原题** — Step 1.8 的截图 + 一行斜体出处
+3. **关键公式** / **关键规则** / **关键概念** — 按题型选标签:计算题用关键公式;进制转换、补码、算法步骤这类按规则操作的题用关键规则;概念/简答题用关键概念。表格列「内容 | 含义 | 本题用途」,表下一行「来源:」
+4. **已知条件**(计算题:量、给定值、换算后,含隐含条件)/ **题目要求**(概念题:问了几件事、要覆盖哪些点)
+5. **分步解题** — `**第 1 步:…**` 每步一件事,先一句为什么再计算;子题按 (a)(b) 分块;**最后一步验算或合理性检查**
+6. `> [!success] 答案` → `> [!warning]- 易错点`(折叠)→ `> [!note]- English Concise Answer`(折叠,2–4 行)
 
-→ 完整规则 + Good/Bad 对照见 `references/workflow-detail.md` §Step 5
+→ 完整规则、标签选择表、反例见 `references/workflow-detail.md` §Step 5
 
 ### Step 6: 答案速查表
 
@@ -234,14 +241,15 @@ tutorial 写完后,自动跟 `<CODE>_principles.md` 对账:Read _principles → 
 2. **数值答案必须带单位**
 3. **不伪造物理/化学数据** — 不确定用 `> [!warning] 请核实` 标记
 4. **不声称"已验证"** — 结果是 proposed solution,等用户验
-5. **详细计算前必须做量级估算** + 算完反向校验
+5. **每题分步解题的最后一步必须验算或做合理性检查**(另一种算法复算 / 与上限、量级对比 / 代回)
 6. **不给题目难度排序**("trivial" / "简单"等)
 
 ## Reference index
 
 | 何时读 | 文件 |
 |---|---|
-| Step 5 写解答 / 不确定方案 B 结构怎么落地 | `references/workflow-detail.md` §Step 5 |
+| Step 1.8 截原题图 | `references/workflow-detail.md` §Step 1.8 |
+| Step 5 写解答 / 关键公式·规则·概念怎么选 | `references/workflow-detail.md` §Step 5 |
 | Step 7.6 反向校验细节 / bug 报告模板 | `references/workflow-detail.md` §Step 7.6 |
-| 想看完整 Good 范例(Problem 2 范德华) | `references/lessons.md` §Example |
+| 想看完整 Good 范例 | `references/lessons.md` §Example |
 | 遇到具体 failure(PDF 加密误报 / 数据缺单位等) | `references/lessons.md` §Failure modes |

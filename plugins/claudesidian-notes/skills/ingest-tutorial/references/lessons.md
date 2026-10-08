@@ -6,69 +6,103 @@
 
 ## Example
 
-> ⚠️ 本例写于老规范时期,公式引用格式以 SKILL.md Step 3/5 为准(_principles 编号,不用 wikilink 引 lecture / 概念);看结构(一气呵成解答 + English Concise Answer),别抄"来源"列和"涉及知识点"的引用格式。
+范例取自 CST308 T01（2026-10 定稿版式）。公式来源列的引用格式以 SKILL.md Step 3/5 为准。
 
-**Good**(方案 B 结构):
-```markdown
-## 本次公式速查
+### Good A：计算题（关键公式 + 已知条件）
 
-| 公式 | 含义 | 来源 |
-|---|---|---|
-| $PV = nRT$ | 理想气体状态方程 | [[L03_equations_of_state]] |
-| $(P + \frac{n^2a}{V^2})(V-nb) = nRT$ | 范德华方程 | [[L03_equations_of_state]] |
-
+````markdown
 ## Problem 2
 
-> (原题) Closed rigid vessel 0.1 m³, 2 mol CO₂, 300 K. Calculate
-> pressure using (a) ideal gas (b) van der Waals. Discuss deviation.
->
-> **中文翻译**:一个 0.1 m³ 的密闭刚性容器,内含 2 mol CO₂,温度 300 K。
-> 求压强:(a) 用理想气体方程 (b) 用范德华方程,并讨论二者偏差。
+**中文翻译**
 
-**涉及知识点**: [[状态方程]], [[范德华方程]]
+> 同一个**指令集架构（instruction set architecture, ISA）**有两种实现。计算机 A 的**时钟周期时间（clock cycle time）**为 250 ps，运行某程序时 CPI 为 2.0；计算机 B 的时钟周期时间为 500 ps，CPI 为 1.2。对这个程序而言，哪台计算机更快？快多少？
 
-### 解答
+**原题**
 
-这题本质是对比理想气体 vs 实际气体的修正,关键在理解范德华 `a`(分子间
-吸引,降 P)和 `b`(分子体积,升 P)的物理作用。
+![[_attachments/<stem>/images/T01_Q2_original.png]]
 
-**量级估算**:P ≈ 2×8.3×300/0.1 ≈ 50 kPa(0.5 atm)。CO₂ 在这条件下
-偏差应在 1–5% 范围。
+*原题截图：Tutorial PDF 第 1 页，第 2 题。*
 
-**(a) 理想气体**——直接代入,无相互作用修正:
-$$P = \frac{nRT}{V} = \frac{2 \times 8.314 \times 300}{0.1} \approx 49.9 \text{ kPa}$$
-与量级估算一致。
+**关键公式**
 
-**(b) 范德华**——加入 a, b 修正项。先把方程展开求 P:
-$$P = \frac{nRT}{V - nb} - \frac{n^2 a}{V^2}$$
-代入 CO₂ 的 a = 0.3640 Pa·m⁶/mol², b = 4.267×10⁻⁵ m³/mol(此处查 [[Perry's Handbook]]):
-$$P_{vdW} \approx 48.2 \text{ kPa}$$
-偏差 3.4%,与估算的 1–5% 吻合;`b` 让 P 略升, `a` 让 P 略降,后者占主导,所以 P_vdW < P_ideal。
+| 公式 | 符号含义 | 本题用途 |
+|---|---|---|
+| $T_{\mathrm{CPU}}=IC\times CPI\times t$ | $IC$：指令数；$t$：时钟周期时间（秒/周期） | 求两台机器的 CPU 时间 |
+| $n=\dfrac{T_Y}{T_X}$ | X 比 Y 快 $n$ 倍 | 求快多少 |
 
-**最终答案**:(a) $P_{ideal} = 49.9$ kPa;(b) $P_{vdW} = 48.2$ kPa,偏差 3.4%
+来源：[[L01_xxx#知识块 8 · CPU 性能方程与加权 CPI]]。
 
-### English Concise Answer
+**已知条件**
 
-Using the **ideal gas equation** with $n$=2 mol, $T$=300 K, $V$=0.1 m³:
-$$P_{ideal} = \frac{nRT}{V} = \frac{2 \times 8.314 \times 300}{0.1} \approx 49.9 \text{ kPa}$$
+| 量 | 计算机 A | 计算机 B |
+|---|---|---|
+| 时钟周期时间 $t$ | 250 ps | 500 ps |
+| CPI | 2.0 | 1.2 |
+| 指令数 $IC$ | 同一 ISA、同一程序 ⇒ 相同，设为 $I$ | $I$ |
 
-Using the **van der Waals equation** with CO₂ constants $a = 0.3640$ Pa·m⁶/mol² and $b = 4.267 \times 10^{-5}$ m³/mol:
-$$P_{vdW} = \frac{nRT}{V - nb} - \frac{n^2 a}{V^2} \approx 48.2 \text{ kPa}$$
+**分步解题**
 
-The van der Waals pressure is about **3.4 % lower** than the ideal-gas value. The attractive term $-n^2a/V^2$ dominates over the excluded-volume correction $-nb$, so real CO₂ exerts slightly less pressure than predicted by the ideal-gas law at this condition.
+**第 1 步：求每台机器的 CPU 时间**
 
-### 易错
+给的是周期时间，所以用乘法形式：
 
-> [!warning]
-> - $n^2a/V^2$ 里 $n^2$ 容易写成 $n$
-> - 范德华 a 在不同文献单位不同,差 10⁶ 倍要小心
-```
+$$
+T_A=I\times2.0\times250\ \text{ps}=500I\ \text{ps},\qquad T_B=I\times1.2\times500\ \text{ps}=600I\ \text{ps}
+$$
 
-**Bad 反例**:
-- 无中文翻译(中文母语用户读长英文题面慢)
-- 无 English Concise Answer(考试 / 作业要交英文版没法直接用)
-- "思路"和"解答"分两段写,同一推理说两遍
-- "解答"末尾给答案,又开"最终答案"段再写一次(同结论说 3 次)
+**第 2 步：求快多少**
+
+$$
+\frac{P_A}{P_B}=\frac{T_B}{T_A}=\frac{600I}{500I}=1.2
+$$
+
+**第 3 步：检查**
+
+$I$ 约掉，不需要具体指令数；A 的 CPI 高但周期只有一半，结果合理。
+
+> [!success] 答案
+> - **计算机 A 更快**，性能是 B 的 **1.2 倍**
+
+> [!warning]- 易错点
+> - 只比较 CPI 或只比较周期：必须相乘。
+
+> [!note]- English Concise Answer
+> $T_A=500I$ ps, $T_B=600I$ ps, so A is $600/500=1.2$ times as fast as B.
+````
+
+### Good B：概念题（关键概念 + 题目要求）
+
+````markdown
+**关键概念**
+
+| 概念 | 含义 | 与本题的关系 |
+|---|---|---|
+| 功率密度（power density） | 单位面积上的功耗 | 频率、密度上升 → 散热难 |
+| 存储器延迟（latency）/ 吞吐量（throughput） | 等多久拿到数据 / 每秒传多少数据 | 跟不上处理器 → 处理器空等 |
+
+来源：[[L02_xxx#知识块 6 · …]]（Slide 12）。
+
+**题目要求**
+
+列出并简要讨论障碍：课件给两项（功耗、存储器速度）；RC 延迟是教材补充，标延伸。
+
+**分步解题**
+
+**第 1 点：功耗与散热**……
+**第 2 点：存储器延迟与吞吐量**……
+**第 3 点：RC 延迟**（延伸，非原资料内容）……
+````
+
+规则/算法题（进制转换、补码）同 Good A，只把 **关键公式** 换成 **关键规则**，表头「规则 | 含义 | 本题用途」。
+
+### Bad 反例
+
+- 用 `### ① 中文翻译`、`### 解答` 等小标题分段：Obsidian 里字号过大，一题被切碎
+- 原题只抄 PDF 文字层：表格是图片时数字全丢
+- 翻译放在原题下面；原题与关键公式之间插"思路/量级估算"段
+- 概念题写「关键公式：无」而不换成关键概念
+- 无中文翻译、或只翻译一半（表格不译）
+- 同一结论在正文、"最终答案"段、答案框里写三遍
 
 ---
 
